@@ -82,11 +82,26 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts }] })
                     });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        if (response.status === 400) throw new Error("API 金鑰無效或格式錯誤。");
+                        if (response.status === 429) throw new Error("請求太頻繁，請稍後再試（免費額度限制）。");
+                        throw new Error(errorData.error?.message || "連線異常，請稍後重試。");
+                    }
+
                     const data = await response.json();
-                    const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
-                    setResult(JSON.parse(text));
+                    
+                    if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        throw new Error("模型未回傳有效數據，可能圖片不夠清晰。");
+                    }
+
+                    const rawText = data.candidates[0].content.parts[0].text;
+                    const cleanText = rawText.replace(/```json|```/g, '').trim();
+                    setResult(JSON.parse(cleanText));
                 } catch (err) {
-                    setError("分析連線失敗，請檢查金鑰或網路。");
+                    console.error(err);
+                    setError(err.message || "分析連線失敗，請檢查金鑰或網路。");
                 } finally {
                     setIsAnalyzing(false);
                 }
@@ -133,7 +148,14 @@
                                         )}
                                     </div>
 
-                                    {error && <p className="text-xs text-red-800 tracking-wider text-center">{error}</p>}
+                                    {error && (
+                                        <div className="p-4 bg-red-50 border border-red-100 rounded-sm">
+                                            <p className="text-xs text-red-800 tracking-wider text-center leading-relaxed">
+                                                {error}<br/>
+                                                <span className="text-[10px] opacity-70">請確認是否開啟 VPN 或網路防火牆，並確認 Key 狀態。</span>
+                                            </p>
+                                        </div>
+                                    )}
 
                                     <div className="flex justify-center pt-4">
                                         <button 
