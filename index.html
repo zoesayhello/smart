@@ -85,9 +85,9 @@
 
                     if (!response.ok) {
                         const errorData = await response.json();
-                        if (response.status === 400) throw new Error("金鑰無效。請重新確認申請的 Key 是否複製完整。");
-                        if (response.status === 403) throw new Error("存取被拒。請確認 VPN 是否正常連線至支援地區。");
-                        if (response.status === 429) throw new Error("請求過多。請稍等一分鐘後再試一次。");
+                        if (response.status === 400) throw new Error("金鑰無效。請確認複製的金鑰是否正確，且無多餘空格。");
+                        if (response.status === 403) throw new Error("存取被拒。如果您在台灣，請確認是否使用了公司/學校受限網路。");
+                        if (response.status === 429) throw new Error("請求過多。免費版 API 有頻率限制，請稍候再試。");
                         throw new Error(errorData.error?.message || "網路連線不穩定，請稍後重試。");
                     }
 
@@ -102,7 +102,7 @@
                     setResult(JSON.parse(cleanText));
                 } catch (err) {
                     console.error(err);
-                    setError(err.message || "發生未知連線錯誤。");
+                    setError(err.message || "發生連線錯誤，請確認您的網路狀況。");
                 } finally {
                     setIsAnalyzing(false);
                 }
@@ -158,10 +158,10 @@
                                                 {error}
                                             </p>
                                             <div className="mt-3 pt-3 border-t border-red-100 text-[10px] text-red-500/80 leading-relaxed">
-                                                <p className="font-bold mb-1">建議檢查：</p>
-                                                <p>1. 是否已在 Google AI Studio 建立新金鑰？</p>
-                                                <p>2. VPN 是否正常切換至美國或日本節點？</p>
-                                                <p>3. 照片是否包含清晰的營養成分表？</p>
+                                                <p className="font-bold mb-1">台灣使用者檢查要點：</p>
+                                                <p>1. 金鑰是否完整：確認開頭為 AIza...</p>
+                                                <p>2. 網路環境：若使用公司 WiFi，請嘗試切換至手機 4G/5G 熱點再試。</p>
+                                                <p>3. 照片品質：確保包裝上的營養成分文字清晰可辨識。</p>
                                             </div>
                                         </div>
                                     )}
@@ -172,7 +172,7 @@
                                             disabled={isAnalyzing || images.length === 0}
                                             className="btn-minimal px-12 py-3 text-sm font-medium tracking-widest disabled:opacity-30"
                                         >
-                                            {isAnalyzing ? "正在讀取..." : "開始分析"}
+                                            {isAnalyzing ? "正在連線 Google..." : "開始分析"}
                                         </button>
                                     </div>
                                 </div>
