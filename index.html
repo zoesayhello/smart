@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Áæi§p∫Î∆F Nutrition Elf - Pure Minimalist</title>
+    <!-- ∏¸§J•≤≠n∏¸®„ -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --washi-color: #F7F3F0;
+            --sumi-color: #333333;
+            --tea-green: #89937C;
+            --sand-gray: #E0DDD5;
+        }
+        body { 
+            font-family: 'Noto Sans TC', sans-serif; 
+            background-color: var(--washi-color);
+            color: var(--sumi-color);
+            letter-spacing: 0.05em;
+        }
+        h1, h2 { font-family: 'Noto Serif TC', serif; }
+        ::-webkit-scrollbar { width: 0; background: transparent; }
+        .btn-minimal {
+            transition: all 0.3s ease;
+            border: 1px solid var(--sumi-color);
+        }
+        .btn-minimal:hover {
+            background-color: var(--sumi-color);
+            color: white;
+        }
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-up { animation: fade-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const App = () => {
+            const [apiKey, setApiKey] = useState('');
+            const [images, setImages] = useState([]);
+            const [isAnalyzing, setIsAnalyzing] = useState(false);
+            const [result, setResult] = useState(null);
+            const [error, setError] = useState(null);
+
+            const handleImageUpload = (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => setImages(prev => [...prev, reader.result]);
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            const analyzeNutrition = async () => {
+                if (!apiKey) { setError("Ω–øÈ§J API ™˜∆_"); return; }
+                if (images.length === 0) { setError("Ω–§W∂«≠π´~∑”§˘"); return; }
+                setIsAnalyzing(true);
+                setError(null);
+
+                try {
+                    const prompt = "ßA¨O§@¶Ï∑•¬≤≠∑ÆÊ™∫±M∑~¿ÁæiÆv°CΩ–≈™®˙πœ§˘®√•H JSON ÆÊ¶°¶^¿≥°AªyÆ∑≈©M±M∑~°CΩ–ΩT´O§∫Æe¨“¨∞¡c≈È§§§Â°CJSONµ≤∫c°G{ \"productName\": \"¶W∫Ÿ\", \"verdict\": { \"title\": \"§@•y∏‹¡`µ≤\", \"color\": \"green|yellow|red\" }, \"highlights\": [{\"label\":\"º–≈“\",\"value\":\"º∆≠»\",\"desc\":\"µ˚ª˘\",\"type\":\"good|bad\"}], \"translations\": [{\"origin\":\"≠Ï§Â\",\"simplified\":\"§§§Â\",\"explain\":\"•’∏‹ª°©˙\"}], \"advice\": {\"target\":\"æA¶XπÔ∂H\",\"warning\":\"ƒµªy\",\"action\":\"•Õ¨°´ÿƒ≥\"} }";
+                    
+                    const parts = [
+                        { text: prompt },
+                        ...images.map(img => ({ inlineData: { mimeType: "image/png", data: img.split(',')[1] } }))
+                    ];
+
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ contents: [{ parts }] })
+                    });
+                    const data = await response.json();
+                    const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
+                    setResult(JSON.parse(text));
+                } catch (err) {
+                    setError("§¿™R≥sΩu•¢±—°AΩ–¿À¨d™˜∆_©Œ∫Ù∏Ù°C");
+                } finally {
+                    setIsAnalyzing(false);
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-6 sm:p-12">
+                    <div className="w-full max-w-lg">
+                        {/* Header */}
+                        <header className="mb-12 text-center">
+                            <h1 className="text-3xl font-bold mb-2 tracking-widest text-neutral-800">¿Áæi§p∫Î∆F</h1>
+                            <p className="text-sm text-neutral-500 font-light italic">°X •Õ¨°§§™∫¿Áæiæ« °X</p>
+                        </header>
+
+                        <main className="space-y-8">
+                            {!result ? (
+                                <div className="space-y-6">
+                                    <div className="border-b border-neutral-300 pb-2">
+                                        <input 
+                                            type="password" 
+                                            placeholder="Gemini API Key" 
+                                            className="w-full bg-transparent outline-none text-sm placeholder-neutral-400"
+                                            value={apiKey}
+                                            onChange={(e) => setApiKey(e.target.value)}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {images.map((img, i) => (
+                                            <div key={i} className="relative group">
+                                                <img src={img} className="w-full h-40 object-cover rounded-sm grayscale-[0.3] hover:grayscale-0 transition-all duration-500" />
+                                                <button 
+                                                    onClick={() => setImages(prev => prev.filter((_, idx) => idx !== i))}
+                                                    className="absolute top-1 right-1 bg-white/80 w-6 h-6 flex items-center justify-center rounded-full text-[10px]"
+                                                >ùT</button>
+                                            </div>
+                                        ))}
+                                        {images.length < 4 && (
+                                            <label className="h-40 border border-dashed border-neutral-300 rounded-sm flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-100 transition-colors">
+                                                <span className="text-2xl font-light text-neutral-400">°œ</span>
+                                                <span className="text-[10px] uppercase tracking-widest text-neutral-400 mt-2">Upload Image</span>
+                                                <input type="file" multiple className="hidden" onChange={handleImageUpload} />
+                                            </label>
+                                        )}
+                                    </div>
+
+                                    {error && <p className="text-xs text-red-800 tracking-wider text-center">{error}</p>}
+
+                                    <div className="flex justify-center pt-4">
+                                        <button 
+                                            onClick={analyzeNutrition}
+                                            disabled={isAnalyzing || images.length === 0}
+                                            className="btn-minimal px-12 py-3 text-sm font-medium tracking-widest disabled:opacity-30"
+                                        >
+                                            {isAnalyzing ? "•ø¶b∏—≈™..." : "§¿™R∂}©l"}
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="animate-up space-y-8">
+                                    <div className="bg-white p-8 rounded-sm border border-neutral-200 shadow-sm relative overflow-hidden">
+                                        <div className="absolute top-0 left-0 w-1 h-full" style={{backgroundColor: result.verdict.color === 'green' ? '#89937C' : result.verdict.color === 'red' ? '#A67B7B' : '#C7B198'}}></div>
+                                        
+                                        <h2 className="text-2xl font-bold mb-1 text-neutral-800">{result.productName}</h2>
+                                        <p className="text-sm text-neutral-500 mb-6">{result.verdict.title}</p>
+                                        
+                                        <div className="grid grid-cols-2 gap-y-6 gap-x-8 py-6 border-y border-neutral-100">
+                                            {result.highlights.map((h, i) => (
+                                                <div key={i} className="space-y-1">
+                                                    <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-tighter">{h.label}</p>
+                                                    <p className="text-lg font-medium">{h.value}</p>
+                                                    <p className="text-[10px] text-neutral-500 leading-tight">{h.desc}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <div className="mt-8">
+                                            <p className="text-[11px] font-bold text-neutral-400 mb-4 tracking-widest uppercase">¶®§¿∏—™R∞Oø˝</p>
+                                            <div className="space-y-5">
+                                                {result.translations.map((t, i) => (
+                                                    <div key={i} className="group">
+                                                        <div className="flex items-baseline gap-2">
+                                                            <span className="text-xs font-bold text-neutral-800">{t.simplified}</span>
+                                                            <span className="text-[10px] text-neutral-300 font-light italic">({t.origin})</span>
+                                                        </div>
+                                                        <p className="text-xs text-neutral-500 mt-1 leading-relaxed">{t.explain}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-8 border border-neutral-200 rounded-sm bg-neutral-50 space-y-4">
+                                        <h3 className="text-xs font-bold tracking-widest uppercase text-neutral-400">§È±`´ÿƒ≥</h3>
+                                        <div className="grid gap-4 text-xs leading-relaxed text-neutral-600">
+                                            <p><span className="font-bold text-neutral-800 mr-2">°iæA¶X°j</span>{result.advice.target}</p>
+                                            <p><span className="font-bold text-neutral-800 mr-2">°i™`∑N°j</span>{result.advice.warning}</p>
+                                            <p><span className="font-bold text-neutral-800 mr-2">°i∞ı¶Ê°j</span>{result.advice.action}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-center pb-12">
+                                        <button 
+                                            onClick={() => {setResult(null); setImages([]);}} 
+                                            className="text-xs text-neutral-400 hover:text-neutral-800 underline underline-offset-8 decoration-neutral-200 transition-all"
+                                        >
+                                            ™¶^≠´∑s±Ω¥y
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </main>
+
+                        <footer className="mt-12 text-center text-[10px] text-neutral-300 font-light tracking-[0.3em]">
+                            NUTRITION ELF °X PURITY & HEALTH
+                        </footer>
+                    </div>
+
+                    {isAnalyzing && (
+                        <div className="fixed inset-0 bg-[#F7F3F0]/90 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+                            <div className="w-12 h-[1px] bg-neutral-300 mb-4 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-neutral-800 translate-x-[-100%] animate-[loading_1.5s_infinite]"></div>
+                            </div>
+                            <p className="text-[10px] tracking-[0.5em] text-neutral-500 uppercase">Analyzing</p>
+                            <style>{`
+                                @keyframes loading {
+                                    0% { transform: translateX(-100%); }
+                                    100% { transform: translateX(100%); }
+                                }
+                            `}</style>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
