@@ -1,10 +1,11 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+ï»¿<!DOCTYPE html>
+<html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Àç¾i¤pºëÆF Nutrition Elf - Pure Minimalist</title>
-    <!-- ¸ü¤J¥²­n¸ü¨ã -->
+    <title>ç‡Ÿé¤Šå°ç²¾éˆ Nutrition Elf - Pure Minimalist</title>
+    <!-- è¼‰å…¥å¿…è¦è¼‰å…· -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -63,13 +64,13 @@
             };
 
             const analyzeNutrition = async () => {
-                if (!apiKey) { setError("½Ğ¿é¤J API ª÷Æ_"); return; }
-                if (images.length === 0) { setError("½Ğ¤W¶Ç­¹«~·Ó¤ù"); return; }
+                if (!apiKey) { setError("è«‹è¼¸å…¥ API é‡‘é‘°"); return; }
+                if (images.length === 0) { setError("è«‹ä¸Šå‚³é£Ÿå“ç…§ç‰‡"); return; }
                 setIsAnalyzing(true);
                 setError(null);
 
                 try {
-                    const prompt = "§A¬O¤@¦ì·¥Â²­·®æªº±M·~Àç¾i®v¡C½ĞÅª¨ú¹Ï¤ù¨Ã¥H JSON ®æ¦¡¦^À³¡A»y®ğ·Å©M±M·~¡C½Ğ½T«O¤º®e¬Ò¬°ÁcÅé¤¤¤å¡CJSONµ²ºc¡G{ \"productName\": \"¦WºÙ\", \"verdict\": { \"title\": \"¤@¥y¸ÜÁ`µ²\", \"color\": \"green|yellow|red\" }, \"highlights\": [{\"label\":\"¼ĞÅÒ\",\"value\":\"¼Æ­È\",\"desc\":\"µû»ù\",\"type\":\"good|bad\"}], \"translations\": [{\"origin\":\"­ì¤å\",\"simplified\":\"¤¤¤å\",\"explain\":\"¥Õ¸Ü»¡©ú\"}], \"advice\": {\"target\":\"¾A¦X¹ï¶H\",\"warning\":\"Äµ»y\",\"action\":\"¥Í¬¡«ØÄ³\"} }";
+                    const prompt = "ä½ æ˜¯ä¸€ä½æ¥µç°¡é¢¨æ ¼çš„å°ˆæ¥­ç‡Ÿé¤Šå¸«ã€‚è«‹è®€å–åœ–ç‰‡ä¸¦ä»¥ JSON æ ¼å¼å›æ‡‰ï¼Œèªæ°£æº«å’Œå°ˆæ¥­ã€‚è«‹ç¢ºä¿å…§å®¹çš†ç‚ºç¹é«”ä¸­æ–‡ã€‚JSONçµæ§‹ï¼š{ \"productName\": \"åç¨±\", \"verdict\": { \"title\": \"ä¸€å¥è©±ç¸½çµ\", \"color\": \"green|yellow|red\" }, \"highlights\": [{\"label\":\"æ¨™ç±¤\",\"value\":\"æ•¸å€¼\",\"desc\":\"è©•åƒ¹\",\"type\":\"good|bad\"}], \"translations\": [{\"origin\":\"åŸæ–‡\",\"simplified\":\"ä¸­æ–‡\",\"explain\":\"ç™½è©±èªªæ˜\"}], \"advice\": {\"target\":\"é©åˆå°è±¡\",\"warning\":\"è­¦èª\",\"action\":\"ç”Ÿæ´»å»ºè­°\"} }";
                     
                     const parts = [
                         { text: prompt },
@@ -85,7 +86,7 @@
                     const text = data.candidates[0].content.parts[0].text.replace(/```json|```/g, '').trim();
                     setResult(JSON.parse(text));
                 } catch (err) {
-                    setError("¤ÀªR³s½u¥¢±Ñ¡A½ĞÀË¬dª÷Æ_©Îºô¸ô¡C");
+                    setError("åˆ†æé€£ç·šå¤±æ•—ï¼Œè«‹æª¢æŸ¥é‡‘é‘°æˆ–ç¶²è·¯ã€‚");
                 } finally {
                     setIsAnalyzing(false);
                 }
@@ -96,8 +97,8 @@
                     <div className="w-full max-w-lg">
                         {/* Header */}
                         <header className="mb-12 text-center">
-                            <h1 className="text-3xl font-bold mb-2 tracking-widest text-neutral-800">Àç¾i¤pºëÆF</h1>
-                            <p className="text-sm text-neutral-500 font-light italic">¡X ¥Í¬¡¤¤ªºÀç¾i¾Ç ¡X</p>
+                            <h1 className="text-3xl font-bold mb-2 tracking-widest text-neutral-800">ç‡Ÿé¤Šå°ç²¾éˆ</h1>
+                            <p className="text-sm text-neutral-500 font-light italic">â€” ç”Ÿæ´»ä¸­çš„ç‡Ÿé¤Šå­¸ â€”</p>
                         </header>
 
                         <main className="space-y-8">
@@ -120,12 +121,12 @@
                                                 <button 
                                                     onClick={() => setImages(prev => prev.filter((_, idx) => idx !== i))}
                                                     className="absolute top-1 right-1 bg-white/80 w-6 h-6 flex items-center justify-center rounded-full text-[10px]"
-                                                >T</button>
+                                                >âœ•</button>
                                             </div>
                                         ))}
                                         {images.length < 4 && (
                                             <label className="h-40 border border-dashed border-neutral-300 rounded-sm flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-100 transition-colors">
-                                                <span className="text-2xl font-light text-neutral-400">¡Ï</span>
+                                                <span className="text-2xl font-light text-neutral-400">ï¼‹</span>
                                                 <span className="text-[10px] uppercase tracking-widest text-neutral-400 mt-2">Upload Image</span>
                                                 <input type="file" multiple className="hidden" onChange={handleImageUpload} />
                                             </label>
@@ -140,7 +141,7 @@
                                             disabled={isAnalyzing || images.length === 0}
                                             className="btn-minimal px-12 py-3 text-sm font-medium tracking-widest disabled:opacity-30"
                                         >
-                                            {isAnalyzing ? "¥¿¦b¸ÑÅª..." : "¤ÀªR¶}©l"}
+                                            {isAnalyzing ? "æ­£åœ¨è§£è®€..." : "åˆ†æé–‹å§‹"}
                                         </button>
                                     </div>
                                 </div>
@@ -163,7 +164,7 @@
                                         </div>
 
                                         <div className="mt-8">
-                                            <p className="text-[11px] font-bold text-neutral-400 mb-4 tracking-widest uppercase">¦¨¤À¸ÑªR°O¿ı</p>
+                                            <p className="text-[11px] font-bold text-neutral-400 mb-4 tracking-widest uppercase">æˆåˆ†è§£æè¨˜éŒ„</p>
                                             <div className="space-y-5">
                                                 {result.translations.map((t, i) => (
                                                     <div key={i} className="group">
@@ -179,11 +180,11 @@
                                     </div>
 
                                     <div className="p-8 border border-neutral-200 rounded-sm bg-neutral-50 space-y-4">
-                                        <h3 className="text-xs font-bold tracking-widest uppercase text-neutral-400">¤é±`«ØÄ³</h3>
+                                        <h3 className="text-xs font-bold tracking-widest uppercase text-neutral-400">æ—¥å¸¸å»ºè­°</h3>
                                         <div className="grid gap-4 text-xs leading-relaxed text-neutral-600">
-                                            <p><span className="font-bold text-neutral-800 mr-2">¡i¾A¦X¡j</span>{result.advice.target}</p>
-                                            <p><span className="font-bold text-neutral-800 mr-2">¡iª`·N¡j</span>{result.advice.warning}</p>
-                                            <p><span className="font-bold text-neutral-800 mr-2">¡i°õ¦æ¡j</span>{result.advice.action}</p>
+                                            <p><span className="font-bold text-neutral-800 mr-2">ã€é©åˆã€‘</span>{result.advice.target}</p>
+                                            <p><span className="font-bold text-neutral-800 mr-2">ã€æ³¨æ„ã€‘</span>{result.advice.warning}</p>
+                                            <p><span className="font-bold text-neutral-800 mr-2">ã€åŸ·è¡Œã€‘</span>{result.advice.action}</p>
                                         </div>
                                     </div>
 
@@ -192,7 +193,7 @@
                                             onClick={() => {setResult(null); setImages([]);}} 
                                             className="text-xs text-neutral-400 hover:text-neutral-800 underline underline-offset-8 decoration-neutral-200 transition-all"
                                         >
-                                            ªğ¦^­«·s±½´y
+                                            è¿”å›é‡æ–°æƒæ
                                         </button>
                                     </div>
                                 </div>
@@ -200,7 +201,7 @@
                         </main>
 
                         <footer className="mt-12 text-center text-[10px] text-neutral-300 font-light tracking-[0.3em]">
-                            NUTRITION ELF ¡X PURITY & HEALTH
+                            NUTRITION ELF â€” PURITY & HEALTH
                         </footer>
                     </div>
 
