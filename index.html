@@ -85,15 +85,16 @@
 
                     if (!response.ok) {
                         const errorData = await response.json();
-                        if (response.status === 400) throw new Error("API 金鑰無效或格式錯誤。");
-                        if (response.status === 429) throw new Error("請求太頻繁，請稍後再試（免費額度限制）。");
-                        throw new Error(errorData.error?.message || "連線異常，請稍後重試。");
+                        if (response.status === 400) throw new Error("金鑰無效。請重新確認申請的 Key 是否複製完整。");
+                        if (response.status === 403) throw new Error("存取被拒。請確認 VPN 是否正常連線至支援地區。");
+                        if (response.status === 429) throw new Error("請求過多。請稍等一分鐘後再試一次。");
+                        throw new Error(errorData.error?.message || "網路連線不穩定，請稍後重試。");
                     }
 
                     const data = await response.json();
                     
                     if (!data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        throw new Error("模型未回傳有效數據，可能圖片不夠清晰。");
+                        throw new Error("未能讀取到數據。請更換更清晰、光線充足的照片再試。");
                     }
 
                     const rawText = data.candidates[0].content.parts[0].text;
@@ -101,7 +102,7 @@
                     setResult(JSON.parse(cleanText));
                 } catch (err) {
                     console.error(err);
-                    setError(err.message || "分析連線失敗，請檢查金鑰或網路。");
+                    setError(err.message || "發生未知連線錯誤。");
                 } finally {
                     setIsAnalyzing(false);
                 }
@@ -119,14 +120,17 @@
                         <main className="space-y-8">
                             {!result ? (
                                 <div className="space-y-6">
-                                    <div className="border-b border-neutral-300 pb-2">
+                                    <div className="border-b border-neutral-300 pb-2 flex items-center gap-2">
                                         <input 
                                             type="password" 
-                                            placeholder="Gemini API Key" 
-                                            className="w-full bg-transparent outline-none text-sm placeholder-neutral-400"
+                                            placeholder="在此輸入申請的 API Key" 
+                                            className="flex-1 bg-transparent outline-none text-sm placeholder-neutral-400"
                                             value={apiKey}
                                             onChange={(e) => setApiKey(e.target.value)}
                                         />
+                                        {apiKey && (
+                                            <button onClick={() => setApiKey('')} className="text-[10px] text-neutral-400 hover:text-red-500">清除</button>
+                                        )}
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
@@ -142,18 +146,23 @@
                                         {images.length < 4 && (
                                             <label className="h-40 border border-dashed border-neutral-300 rounded-sm flex flex-col items-center justify-center cursor-pointer hover:bg-neutral-100 transition-colors">
                                                 <span className="text-2xl font-light text-neutral-400">＋</span>
-                                                <span className="text-[10px] uppercase tracking-widest text-neutral-400 mt-2">Upload Image</span>
+                                                <span className="text-[10px] uppercase tracking-widest text-neutral-400 mt-2">上傳照片</span>
                                                 <input type="file" multiple className="hidden" onChange={handleImageUpload} />
                                             </label>
                                         )}
                                     </div>
 
                                     {error && (
-                                        <div className="p-4 bg-red-50 border border-red-100 rounded-sm">
-                                            <p className="text-xs text-red-800 tracking-wider text-center leading-relaxed">
-                                                {error}<br/>
-                                                <span className="text-[10px] opacity-70">請確認是否開啟 VPN 或網路防火牆，並確認 Key 狀態。</span>
+                                        <div className="p-5 bg-red-50/50 border border-red-100 rounded-sm">
+                                            <p className="text-xs text-red-800 tracking-wider text-center font-medium">
+                                                {error}
                                             </p>
+                                            <div className="mt-3 pt-3 border-t border-red-100 text-[10px] text-red-500/80 leading-relaxed">
+                                                <p className="font-bold mb-1">建議檢查：</p>
+                                                <p>1. 是否已在 Google AI Studio 建立新金鑰？</p>
+                                                <p>2. VPN 是否正常切換至美國或日本節點？</p>
+                                                <p>3. 照片是否包含清晰的營養成分表？</p>
+                                            </div>
                                         </div>
                                     )}
 
@@ -163,7 +172,7 @@
                                             disabled={isAnalyzing || images.length === 0}
                                             className="btn-minimal px-12 py-3 text-sm font-medium tracking-widest disabled:opacity-30"
                                         >
-                                            {isAnalyzing ? "正在解讀..." : "分析開始"}
+                                            {isAnalyzing ? "正在讀取..." : "開始分析"}
                                         </button>
                                     </div>
                                 </div>
@@ -232,7 +241,7 @@
                             <div className="w-12 h-[1px] bg-neutral-300 mb-4 relative overflow-hidden">
                                 <div className="absolute inset-0 bg-neutral-800 translate-x-[-100%] animate-[loading_1.5s_infinite]"></div>
                             </div>
-                            <p className="text-[10px] tracking-[0.5em] text-neutral-500 uppercase">Analyzing</p>
+                            <p className="text-[10px] tracking-[0.5em] text-neutral-500 uppercase font-light">Analyzing</p>
                             <style>{`
                                 @keyframes loading {
                                     0% { transform: translateX(-100%); }
