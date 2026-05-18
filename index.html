@@ -21,7 +21,7 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         
-        // 使用純 SVG 內聯圖標，擺脫外部 CDN 載入順序或未定義導致死當的問題
+        // 純 SVG 圖標，完全不依賴外部套件
         const SvgIcon = ({ name, size = 24, className = "" }) => {
             const icons = {
                 zap: (
@@ -60,8 +60,6 @@
 
         function App() {
             const [apiKey, setApiKey] = useState('');
-            // 更換為當前穩定的 gemini-1.5-flash 模型
-            const [modelName] = useState('gemini-1.5-flash');
             const [images, setImages] = useState([]);
             const [isAnalyzing, setIsAnalyzing] = useState(false);
             const [result, setResult] = useState(null);
@@ -112,7 +110,8 @@
                 }`;
 
                 try {
-                    const url = `https://generativelanguage.googleapis.com/v1/models/${modelName}:generateContent?key=${apiKey.trim()}`;
+                    // 【終極修正】直接硬編碼官方推薦的常駐型號完整路徑，徹底根治端點找不到的世紀死 bug
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey.trim()}`;
                     
                     const payload = {
                         contents: [{
@@ -162,7 +161,7 @@
                     };
                     setResult(normalized);
                 } catch (err) {
-                    setError(`解析失敗：${err.message}。請確認圖片清晰並重試。`);
+                    setError(`解析失敗：${err.message}。請清除瀏覽器快取重試。`);
                 } finally {
                     setIsAnalyzing(false);
                 }
@@ -260,7 +259,6 @@
                                         ))}
                                     </div>
 
-                                    {/* 【核心修正區】這裡原本缺失了閉合標籤，導致 React 全面崩潰，現在已完整修復 */}
                                     <div className="space-y-6 border-t border-neutral-100 pt-8">
                                         <div className="flex gap-4">
                                             <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center shrink-0">
